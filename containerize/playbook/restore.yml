@@ -1,0 +1,77 @@
+---
+- name: prepare
+  hosts: etcd
+  remote_user: ubuntu
+  tasks:
+    - service:
+        name: etcd
+        state: stopped
+      become: yes
+      become_user: root
+    - file:
+        path: /var/lib/etcd-buffer
+        state: directory
+      become: yes
+      become_user: root
+    - copy:
+        src: /code/etcdStatus
+        dest: /var/lib/etcd-buffer/etcdStatus
+        mode: '0755'
+      become: yes
+      become_user: root
+
+- name: fetch db from last leader node
+  hosts: fetch_node
+  remote_user: ubuntu
+  tasks:
+    - name: Read return
+      command: cat /var/lib/etcd-buffer/etcdStatus
+      register: return_back
+      become: yes
+      become_user: root
+    - set_fact:
+        data_dir: "{{return_back.stdout.split('\n')[3]}}"
+    - debug: var=data_dir
+    - fetch:
+        src: "{{data_dir}}/member/snap/db"
+        dest: /code/backup-file/db
+        mode: '0755'
+      become: yes
+      become_user: root
+
+- name: restore error node
+  hosts: error_node
+  remote_user: ubuntu
+  vars:
+    restore_script: /code/script/restore.sh
+    fetch_flag: "0"
+    local_flag: "0"
+  tasks:  
+    - name: Distribute db to error_node
+      copy:
+        src: /code/backup-file/db
+        dest: /var/lib/etcd-buffer/db
+        mode: '0755'
+      become: yes
+      become_user: root
+
+    - name: restore
+      script: /code/script/restore.sh
+      become: yes
+      become_user: root
+
+- name: clean
+  hosts: etcd
+  remote_user: ubuntu
+  tasks:
+    - name: clean
+      file:
+        path: /var/lib/etcd-buffer
+        state: absent
+      become: yes
+      become_user: root
+    - service:
+        name: etcd
+        state: started
+      become: yes
+      become_user: root

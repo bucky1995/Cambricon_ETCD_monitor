@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: etcd-scan
+  labels:
+    app: etcd-scanner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      apps: etcd-scanner
+  template:
+    metadata:
+      labels:
+        apps: etcd-scanner
+    spec:
+      containers:
+      - name: etcd-scanner
+        image: docker.cambricon.com/library/etcd-scanner
+        securityContext:
+          privileged: true
+          capabilities:
+            drop: ["ALL"]
+        volumeMounts:
+        - name: config
+          mountPath: /code/hosts
+      volumes:
+      - name: config
+        hostPath:
+          path: /home/ubuntu/k8s-transfer/hosts
+          type: File
+      nodeSelector:
+        kubernetes.io/hostname: node3

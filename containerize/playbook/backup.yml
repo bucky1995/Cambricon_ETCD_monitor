@@ -1,0 +1,54 @@
+---
+- name: get leader
+  hosts: etcd
+  remote_user: ubuntu
+  vars:
+    leader_script: /code/script/get_leader.sh
+  tasks:
+    - name: Create etcd-buffer
+      file:
+        path: /var/lib/etcd-buffer
+        state: directory
+      become: yes
+      become_user: root
+    - name: get leader
+      script: "{{leader_script}}"
+      register: leader_ip
+      become: yes
+      become_user: root
+    - set_fact: 
+        leader: "{{leader_ip.stdout_lines[0]}}"
+    - name: set leader group
+      add_host:
+        name: "{{leader}}"
+        groups: "leader"
+
+- name: leader backup and fetch 
+  hosts: leader
+  remote_user: ubuntu
+  vars:
+    backup_script: /code/script/backup.sh
+  tasks:
+    - name: leader backup
+      script: "{{backup_script}}"
+      become: yes
+      become_user: root
+    - name: fetch
+      fetch:
+        src: "/var/lib/etcd-buffer/db"
+        dest: /code/backup-file/
+        flat: yes
+      become: yes
+      become_user: root
+- name: clean
+  hosts: etcd
+  remote_user: ubuntu
+  tasks:
+    - name: clean
+      file:
+        path: /var/lib/etcd-buffer
+        state: absent
+      become: yes
+      become_user: root
+
+      

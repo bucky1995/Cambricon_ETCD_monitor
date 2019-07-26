@@ -1,0 +1,36 @@
+---
+- name: scan error
+  hosts: etcd
+  remote_user: ubuntu
+  vars:
+    scan_error_script: /code/script/scan_error.sh
+  tasks:
+    - name: Create etcd-buffer
+      file:
+        path: /var/lib/etcd-buffer
+        state: directory
+      become: yes
+      become_user: root
+    - name: Execute scan_error script
+      script: "{{scan_error_script}}"
+      become: yes
+      become_user: root
+    - find:
+        paths: /var/lib/etcd-buffer/
+        patterns: "*"
+        recurse: no
+      register: file_fetch
+    - name: Fetch 
+      fetch:
+        src: "{{ item.path }}"
+        dest: /code/return/
+        flat: yes
+      with_items: "{{ file_fetch.files }}"
+      become: yes
+      become_user: root
+    - name: clean
+      file:
+        path: /var/lib/etcd-buffer
+        state: absent
+      become: yes
+      become_user: root
