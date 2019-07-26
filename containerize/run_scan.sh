@@ -1,6 +1,5 @@
 #!/bin/bash
-#written by niuxinbo niuxinbo@cambricon.com
-#All rights reserved by Cambricon
+#written by niuxinbo xinbo1995@outlook.com
 if [ ! -d "/code/return/" ];then
     mkdir /code/return/
 fi

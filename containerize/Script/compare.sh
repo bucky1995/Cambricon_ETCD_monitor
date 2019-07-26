@@ -1,6 +1,5 @@
 #!/bin/bash
-#written by niuxinbo niuxinbo@cambricon.com
-#All rights reserved by Cambricon
+#written by niuxinbo xinbo1995@outlook.com
 file_content=()
 files_temp=$(ls /code/return/*.txt)
 files=(${files_temp// / })

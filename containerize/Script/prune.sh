@@ -1,6 +1,5 @@
 #!/bin/bash
-#written by niuxinbo niuxinbo@cambricon.com
-#All rights reserved by Cambricon
+#written by niuxinbo xinbo1995@outlook.com
 
 ReservedNum=5                  
 rm_file_dir='/code/backup-file' 

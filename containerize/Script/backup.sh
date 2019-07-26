@@ -1,6 +1,5 @@
 #!/bin/bash
-#written by niuxinbo niuxinbo@cambricon.com
-#All rights reserved by Cambricon
+#written by niuxinbo xinbo1995@outlook.com
 export ETCDCTL_API=3
 
 ETCD_CERT_FILE=$(grep -oP 'ETCD_CERT_FILE=\K\S+' /etc/etcd.env)

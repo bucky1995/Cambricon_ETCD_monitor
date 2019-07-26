@@ -1,6 +1,5 @@
 #!/bin/bash
-#written by niuxinbo niuxinbo@cambricon.com
-#All rights reserved by Cambricon
+#written by niuxinbo xinbo1995@outlook.com
 export ETCDCTL_API=3
 ETCD_NAME=$(grep -oP 'ETCD_NAME=\K\S+' /etc/etcd.env)
 ETCD_ADVERTISE_CLIENT_URLS=$(grep -oP 'ETCD_ADVERTISE_CLIENT_URLS=\K\S+' /etc/etcd.env)
